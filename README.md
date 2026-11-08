@@ -1,63 +1,90 @@
-# Eii Filament Turnstile
+# 🛡️ Eii Filament Turnstile
 
-Cloudflare Turnstile integration for Filament 5 forms and auth scaffolding, with action-aware validation and analytics-friendly tracking.
+### Keep bots out. Keep your Filament application protected.
 
-This package gives you:
+<p align="center">
+  <img src="docs/images/filament-turnstile-banner.png" alt="Eii Filament Turnstile - Cloudflare Turnstile for Filament 5">
+</p>
 
-- a reusable `Turnstile` Filament form component,
-- strict server-side Cloudflare Siteverify validation,
-- scaffolding commands for custom Filament auth pages (Login, Register, Request Password Reset),
-- per-form/per-page action support so you can reuse the same site/secret keys while still tracking each flow separately.
+<p align="center">
+  <a href="https://packagist.org/packages/eii/filament-turnstile"><img src="https://img.shields.io/packagist/v/eii/filament-turnstile?style=flat-square&color=blue" alt="Latest Version"></a>
+  <a href="https://packagist.org/packages/eii/filament-turnstile"><img src="https://img.shields.io/packagist/dt/eii/filament-turnstile?style=flat-square&color=success" alt="Total Downloads"></a>
+  <a href="https://packagist.org/packages/eii/filament-turnstile"><img src="https://img.shields.io/packagist/l/eii/filament-turnstile?style=flat-square" alt="License"></a>
+  <img src="https://img.shields.io/badge/PHP-8.2%2B-777BB4?style=flat-square&logo=php&logoColor=white" alt="PHP 8.2+">
+  <img src="https://img.shields.io/badge/Filament-5.x-FDAE4B?style=flat-square" alt="Filament 5">
+  <a href="https://github.com/amit-eiitech/filament-turnstile"><img src="https://img.shields.io/github/stars/amit-eiitech/filament-turnstile?style=flat-square" alt="GitHub Stars"></a>
+</p>
 
-## Requirements
+**Eii Filament Turnstile** brings Cloudflare Turnstile bot protection directly into your Filament 5 application.
 
-- PHP 8.2+
-- Laravel 11.28+ (also supports 12 and 13 via Illuminate constraints)
-- Filament Forms 5.x
+Protect your forms and authentication pages without introducing complicated CAPTCHA workflows or building your own verification infrastructure.
 
-## Installation
+From a reusable form component to ready-to-generate authentication pages, everything is designed to integrate naturally into your existing Filament application.
 
-### Local path install (development)
+**Simple to install. Easy to configure. Strict about security.**
 
-In your Laravel app `composer.json`:
+---
 
-```json
-{
-  "repositories": [
-    {
-      "type": "path",
-      "url": "../eii-filament-turnstile",
-      "options": {
-        "symlink": true
-      }
-    }
-  ]
-}
-```
+## ✨ Why Eii Filament Turnstile?
 
-Then require it:
+Your Filament application may already have authentication, forms and validation. But automated bots can still target login pages, registration forms and other publicly accessible endpoints.
 
-```bash
-composer require eii/filament-turnstile:@dev
-```
+Cloudflare Turnstile offers a privacy-friendly alternative to traditional CAPTCHA challenges.
 
-### Packagist install
+This package connects it to Filament and handles the server-side verification that makes the integration meaningful.
+
+### What you get
+
+| Feature | Description |
+|---|---|
+| 🧩 Reusable Form Component | Add Turnstile verification to any Filament form. |
+| 🔐 Authentication Protection | Generate protected Login, Registration and Password Reset pages. |
+| 🛡️ Server-side Verification | Verify tokens directly with Cloudflare Siteverify. |
+| 🎯 Action-aware Validation | Give each form or authentication flow its own expected action. |
+| 🌐 Hostname Allowlisting | Accept verification responses only from configured hostnames. |
+| ⚡ Fail-closed Security | Reject requests when verification cannot be completed. |
+| 🧪 Testing Support | Use Cloudflare's official test keys for local development and CI. |
+| 🔧 Direct Verifier API | Integrate verification into your own application logic. |
+
+### Built with security in mind
+
+This package does not rely on frontend verification alone.
+
+Every submitted token is validated on the server through Cloudflare's Siteverify API. Expected hostnames and actions are checked before verification is accepted.
+
+---
+
+## 📦 Installation
+
+Install the package using Composer:
 
 ```bash
 composer require eii/filament-turnstile
 ```
 
-Laravel will auto-discover the service provider.
+Laravel automatically discovers the package service provider.
 
-## Configuration
+### Requirements
 
-Publish config:
+| Dependency | Supported Version |
+|---|---|
+| PHP | 8.2+ |
+| Laravel | 11.28+, 12.x, 13.x |
+| Filament Forms | 5.x |
+
+The package uses the corresponding Illuminate HTTP and Support components.
+
+---
+
+## ⚙️ Configuration
+
+Publish the configuration file:
 
 ```bash
 php artisan vendor:publish --tag=filament-turnstile-config
 ```
 
-Add required env values:
+Add the following environment variables to your `.env` file:
 
 ```env
 TURNSTILE_SITE_KEY=your-site-key
@@ -66,14 +93,19 @@ TURNSTILE_ALLOWED_HOSTNAMES=yourdomain.com
 TURNSTILE_ALLOW_MISSING_ACTION=false
 ```
 
-### Important behavior
+You can obtain your Site Key and Secret Key from the [Cloudflare Turnstile Dashboard](https://dash.cloudflare.com/?to=/:account/turnstile).
 
-- `TURNSTILE_ALLOWED_HOSTNAMES` is mandatory and fail-closed (empty list rejects all).
-- Hostnames must be comma-separated plain hosts (no scheme/path/port).
+### Important configuration notes
+
+- `TURNSTILE_ALLOWED_HOSTNAMES` is mandatory. An empty allowlist rejects all verification attempts.
+- Multiple hostnames can be separated by commas.
+- Enter plain hostnames only. Do not include protocols, paths or ports.
 - Keep `TURNSTILE_ALLOW_MISSING_ACTION=false` in production.
-- Action names, widget options, and HTTP timeouts are configured in `config/filament-turnstile.php`.
+- Widget appearance, action names, and HTTP timeouts can be customized through `config/filament-turnstile.php`.
 
-Example actions block:
+### Customize verification actions
+
+You can configure unique action names for different authentication flows:
 
 ```php
 'actions' => [
@@ -83,33 +115,27 @@ Example actions block:
 ],
 ```
 
-## Why actions matter (tracking + security)
+---
 
-You can use the same Turnstile site key and secret key across multiple forms/pages, while assigning a unique action per flow.
+## 🚀 Usage
 
-Example actions:
+### 1. Add Turnstile to any Filament form
 
-- `admin-login`
-- `admin-register`
-- `admin-password-reset-request`
-- `admin-users-create`
-- `admin-orders-update`
-
-Benefits:
-
-- Cloudflare analytics can distinguish traffic by flow.
-- Server-side validation checks the expected action to prevent token reuse across unrelated forms.
-
-## Use in a Filament form
+Import the component:
 
 ```php
 use Eii\FilamentTurnstile\Forms\Components\Turnstile;
 use Filament\Schemas\Schema;
+```
 
+Add it to your Filament form schema:
+
+```php
 public function form(Schema $schema): Schema
 {
     return $schema->components([
-        // ... your fields
+        // Your existing form fields...
+
         Turnstile::make('turnstile_token')
             ->label('Security Verification')
             ->turnstileAction('admin-users-create')
@@ -120,45 +146,110 @@ public function form(Schema $schema): Schema
 }
 ```
 
-Notes:
+That's it! Your form now includes Cloudflare Turnstile verification.
 
-- Field is required.
-- Token is verified server-side via Cloudflare Siteverify.
-- Don’t trust frontend callback alone.
+**Available customization options in this example:**
 
-After a failed submit, you can reset the widget from Livewire:
+- `turnstileAction()` – Assign an expected action to the verification flow.
+- `theme()` – Set the widget theme.
+- `size()` – Customize the widget size.
+- `appearance()` – Configure widget appearance.
+
+The token field is required and is verified server-side. Never rely solely on the frontend callback.
+
+### Reset the widget after failed submissions
+
+If a form submission fails and you need to reset the widget, dispatch the following Livewire event:
 
 ```php
 $this->dispatch('eii-turnstile-reset');
 ```
 
-## Auth page scaffolding commands (Filament 5)
+---
 
-Generate custom Turnstile-enabled auth pages:
+## 🔐 2. Protect Filament Authentication Pages
+
+Don't want to manually build authentication pages?
+
+Eii Filament Turnstile includes Artisan commands that generate custom authentication pages with Turnstile integration.
+
+Run the commands you need:
+
+**Login page**
 
 ```bash
 php artisan make:filament-turnstile-login
+```
+
+**Registration page**
+
+```bash
 php artisan make:filament-turnstile-register
+```
+
+**Password reset request page**
+
+```bash
 php artisan make:filament-turnstile-request-password-reset
 ```
 
-Each command supports `--force` to overwrite existing files.
+Each command also supports `--force` to overwrite existing generated files.
 
-Generated classes:
+### Generated classes
 
-- `App\Filament\Pages\Auth\TurnstileLogin`
-- `App\Filament\Pages\Auth\TurnstileRegister`
-- `App\Filament\Pages\Auth\TurnstileRequestPasswordReset`
+| Command | Generated Class |
+|---|---|
+| Login | `App\Filament\Pages\Auth\TurnstileLogin` |
+| Register | `App\Filament\Pages\Auth\TurnstileRegister` |
+| Password Reset | `App\Filament\Pages\Auth\TurnstileRequestPasswordReset` |
 
-Register them in your Panel provider auth setup. Example:
+Register the generated pages in your Filament Panel Provider.
+
+For example, configure the custom login page:
 
 ```php
 ->login(\App\Filament\Pages\Auth\TurnstileLogin::class)
 ```
 
-(Registration/password-reset wiring may differ depending on your panel config style.)
+Registration and password-reset wiring may differ depending on your existing panel configuration.
 
-## Direct verifier usage
+---
+
+## 🎯 3. Action-aware Verification
+
+One of the important features of this package is action-aware validation.
+
+You can use the same Cloudflare Site Key and Secret Key across multiple forms while assigning a different action to each verification flow.
+
+For example:
+
+| Application Flow | Turnstile Action |
+|---|---|
+| Admin Login | `admin-login` |
+| Admin Registration | `admin-register` |
+| Password Reset | `admin-password-reset-request` |
+| User Creation | `admin-users-create` |
+| Order Update | `admin-orders-update` |
+
+### Why does this matter?
+
+**Better analytics**
+
+Cloudflare can distinguish verification traffic by action, making it easier to understand which parts of your application receive automated traffic.
+
+**Stronger validation**
+
+The package checks whether the returned action matches the expected action for that form.
+
+This helps prevent a valid token generated for one flow from being reused in an unrelated flow.
+
+---
+
+## 🧰 4. Use the Verification Service Directly
+
+Need Turnstile verification outside a Filament form?
+
+You can use the package's verifier contract directly in your application.
 
 ```php
 use Eii\FilamentTurnstile\Contracts\TurnstileVerifier;
@@ -170,23 +261,32 @@ $result = app(TurnstileVerifier::class)->verify(
 );
 
 if (! $result->success) {
-    // reject request
+    // Reject the request.
 }
 ```
 
-## Local testing with Cloudflare test keys
+This makes the verification service useful for custom controllers, application workflows and other integrations where you need direct control over verification.
 
-Cloudflare provides official test keys that work on localhost and CI.
-Reference: <https://developers.cloudflare.com/turnstile/troubleshooting/testing/>
+---
 
-| Site key | Secret key | Behavior |
+## 🧪 5. Testing with Cloudflare Test Keys
+
+You don't need production Cloudflare credentials to test the package locally.
+
+Cloudflare provides official test keys that work on localhost and in CI environments.
+
+### Official test key combinations
+
+| Site Key | Secret Key | Expected Result |
 |---|---|---|
 | `1x00000000000000000000AA` | `1x0000000000000000000000000000000AA` | Always passes |
-| `2x00000000000000000000AB` | `2x0000000000000000000000000000000AA` | Always fails |
-| `1x00000000000000000000AA` | `3x0000000000000000000000000000000AA` | Fails (token already spent) |
-| `3x00000000000000000000FF` | `1x0000000000000000000000000000000AA` | Interactive challenge then pass |
+| `2x00000000000000000000AB` | `1x0000000000000000000000000000000AA` | Always fails |
+| `1x00000000000000000000AA` | `3x0000000000000000000000000000000AA` | Token already spent |
+| `3x00000000000000000000FF` | `1x0000000000000000000000000000000AA` | Interactive challenge, then passes |
 
-Example local env:
+Reference: [Cloudflare – Test your Turnstile implementation](https://developers.cloudflare.com/turnstile/troubleshooting/testing/)
+
+### Example local environment
 
 ```env
 TURNSTILE_SITE_KEY=1x00000000000000000000AA
@@ -195,17 +295,84 @@ TURNSTILE_ALLOWED_HOSTNAMES=example.com
 TURNSTILE_ALLOW_MISSING_ACTION=true
 ```
 
-With test keys, Cloudflare commonly returns `hostname=example.com` and `action=test`, so configure accordingly for local tests.
+**Important:** Cloudflare commonly returns `hostname=example.com` and `action=test` when using these test keys.
 
-## Security model
+Make sure your local configuration accommodates the expected hostname and action.
 
-- Always validates with Cloudflare server-side.
-- Rejects invalid/missing/oversized tokens.
-- Enforces hostname allowlist.
-- Enforces action match (unless missing action is explicitly allowed).
-- Fails closed on API/network/config problems.
-- Does not log secrets or tokens.
+Do not use test keys or relaxed action validation in production.
 
 ---
 
-Current scope includes reusable field + verification service + auth-page scaffolding for Login, Register, and Request Password Reset.
+## 🛡️ Security Model
+
+Security is not an optional layer of this integration.
+
+Eii Filament Turnstile implements the following verification safeguards:
+
+| Security Check | Behavior |
+|---|---|
+| Server-side verification | Every token is checked through Cloudflare Siteverify. |
+| Missing token | Rejected. |
+| Invalid token | Rejected. |
+| Oversized token | Rejected. |
+| Hostname validation | Enforces configured hostname allowlist. |
+| Action validation | Checks the expected action. |
+| Network/API failures | Fails closed. |
+| Configuration errors | Fails closed. |
+| Sensitive information | Secrets and verification tokens are not logged. |
+
+**Fail-closed behavior:** If Cloudflare verification cannot be completed because of API, network or configuration problems, the package does not treat the request as verified.
+
+---
+
+## 🧩 Current Package Scope
+
+The current release provides:
+
+- Reusable Filament Turnstile form component.
+- Server-side verification service.
+- Action-aware validation.
+- Hostname allowlisting.
+- Custom authentication page scaffolding for:
+  - Login
+  - Registration
+  - Password Reset Request
+- Direct verifier contract for custom integrations.
+- Cloudflare test-key support.
+
+---
+
+## 📚 Useful Links
+
+- **Packagist:** [eii/filament-turnstile](https://packagist.org/packages/eii/filament-turnstile)
+- **GitHub Repository:** [amit-eiitech/filament-turnstile](https://github.com/amit-eiitech/filament-turnstile)
+- **Cloudflare Turnstile:** [Official Documentation](https://developers.cloudflare.com/turnstile/)
+- **Cloudflare Test Keys:** [Testing Documentation](https://developers.cloudflare.com/turnstile/troubleshooting/testing/)
+
+---
+
+## 🤝 Contributing
+
+Found an issue, have an improvement in mind, or want to contribute?
+
+Contributions, bug reports and feature suggestions are welcome.
+
+Feel free to open an issue or submit a pull request through the GitHub repository.
+
+---
+
+## 📄 License
+
+This package is open-sourced software licensed under the [MIT License](LICENSE).
+
+---
+
+<p align="center">
+  **Developed with ❤️ by Eii Tech Solutions**
+  
+  <a href="https://eiitechsolutions.com">eiitechsolutions.com</a>
+</p>
+
+<p align="center">
+  If you find this package useful, consider giving it a ⭐ on GitHub!
+</p>

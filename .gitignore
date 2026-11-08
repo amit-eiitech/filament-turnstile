@@ -1,4 +1,4 @@
-/docs/
+/docs/circuit-breaker.md
 /vendor/
 composer.lock
 .phpunit.result.cache
